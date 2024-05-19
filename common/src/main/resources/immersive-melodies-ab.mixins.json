@@ -1,0 +1,23 @@
+{
+  "required": true,
+  "package": "ab.melodiesPort.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "minVersion": "0.8",
+  "mixins": ["EntityMixin", "MobEntityMixin", "ParrotEntityMixin", "ServerChunkManagerMixin", "ServerWorldMixin"],
+  "client": [
+    "AbstractZombieModelMixin",
+    "BipedEntityModelMixin",
+    "ItemRendererMixin",
+    "ModelLoaderMixin",
+    "ScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
+
+
+
+
+
+

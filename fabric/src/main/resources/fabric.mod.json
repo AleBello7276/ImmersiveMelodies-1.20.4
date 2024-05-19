@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "immersive_melodies",
+  "id": "immersive-melodies-ab",
   "version": "${version}",
   "name": "Immersive Melodies",
   "description": "Play custom melodies on various instruments and annoy your friends!",
@@ -17,18 +17,22 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "immersive_melodies.fabric.CommonFabric"
+      "ab.melodiesPort.fabric.CommonFabric"
     ],
     "client": [
-      "immersive_melodies.fabric.ClientFabric"
+      "ab.melodiesPort.fabric.ClientFabric"
     ]
   },
   "mixins": [
-    "immersive_melodies.mixin.json"
+    "immersive-melodies-ab.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.11.3",
+    "minecraft": "~1.20.4",
     "java": ">=8",
-    "fabric-api-base": ">=0.1.0"
+    "fabric-api": ">=0.1.0"
+  },
+  "suggests": {
+    "another-mod": "*"
   }
 }
