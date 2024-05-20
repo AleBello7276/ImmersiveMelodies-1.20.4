@@ -3,12 +3,20 @@
   "package": "ab.melodiesPort.mixin",
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
-  "mixins": ["EntityMixin", "MobEntityMixin", "ParrotEntityMixin", "ServerChunkManagerMixin", "ServerWorldMixin"],
+  "mixins": [
+    "AllayEntityMixin",
+    "MobEntityMixin",
+    "ParrotEntityMixin",
+    "ServerChunkManagerMixin",
+    "ServerWorldMixin"
+  ],
   "client": [
     "AbstractZombieModelMixin",
     "BipedEntityModelMixin",
+    "ClientWorldMixin",
     "ItemRendererMixin",
     "ModelLoaderMixin",
+    "PiglinEntityModelMixin",
     "ScreenMixin"
   ],
   "injectors": {

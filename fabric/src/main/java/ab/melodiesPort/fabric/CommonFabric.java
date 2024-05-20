@@ -15,11 +15,13 @@ import net.minecraft.registry.Registry;
 import net.minecraft.resource.ResourceType;
 
 public final class CommonFabric implements ModInitializer {
+    static {
+        new NetworkHandlerImpl();
+        new RegistrationImpl();
+    }
+
     @Override
     public void onInitialize() {
-        new RegistrationImpl();
-        new NetworkHandlerImpl();
-
         Items.bootstrap();
         Messages.bootstrap();
         Sounds.bootstrap();
@@ -37,4 +39,3 @@ public final class CommonFabric implements ModInitializer {
         Registry.register(Registries.ITEM_GROUP, Common.locate("group"), group);
     }
 }
-

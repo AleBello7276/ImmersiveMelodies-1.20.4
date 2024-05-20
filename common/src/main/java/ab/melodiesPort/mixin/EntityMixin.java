@@ -1,4 +1,4 @@
-package ab.melodiesPort.mixin;
+/*package ab.melodiesPort.mixin;
 
 import ab.melodiesPort.item.InstrumentItem;
 import net.minecraft.entity.Entity;
@@ -27,3 +27,4 @@ public abstract class EntityMixin {
         });
     }
 }
+*/

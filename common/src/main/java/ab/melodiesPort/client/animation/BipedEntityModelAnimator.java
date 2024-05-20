@@ -21,12 +21,16 @@ public class BipedEntityModelAnimator {
         return null;
     }
 
+    private static <T extends LivingEntity> boolean isInMainHand(T entity) {
+        return entity.getMainHandStack().getItem() instanceof InstrumentItem;
+    }
+
     public static <T extends LivingEntity> ModelPart getLeftArm(BipedEntityModel<T> model, T entity) {
-        return entity.getMainHandStack().getItem() instanceof InstrumentItem ? model.leftArm : model.rightArm;
+        return isInMainHand(entity) ? model.leftArm : model.rightArm;
     }
 
     public static <T extends LivingEntity> ModelPart getRightArm(BipedEntityModel<T> model, T entity) {
-        return entity.getMainHandStack().getItem() instanceof InstrumentItem ? model.rightArm : model.leftArm;
+        return isInMainHand(entity) ? model.rightArm : model.leftArm;
     }
 
     public static <T extends LivingEntity> void setAngles(BipedEntityModel<T> model, T entity) {
@@ -41,6 +45,13 @@ public class BipedEntityModelAnimator {
             progress.visualTick(time);
 
             ItemAnimators.get(Registries.ITEM.getId(item)).setAngles(left, right, model, entity, progress, time);
+
+            if (!isInMainHand(entity)) {
+                left.roll = -left.roll;
+                right.roll = -right.roll;
+                left.yaw = -left.yaw;
+                right.yaw = -right.yaw;
+            }
         }
     }
 }
