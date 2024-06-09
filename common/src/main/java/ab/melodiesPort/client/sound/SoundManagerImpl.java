@@ -35,6 +35,6 @@ public class SoundManagerImpl implements SoundManager {
     @Override
     public boolean audible(Entity entity) {
         Entity cameraEntity = MinecraftClient.getInstance().getCameraEntity();
-        return cameraEntity != null && cameraEntity.distanceTo(entity) < 24.0f;
+        return cameraEntity != null && cameraEntity.distanceTo(entity) < Config.getInstance().maxAudibleDistance;
     }
 }

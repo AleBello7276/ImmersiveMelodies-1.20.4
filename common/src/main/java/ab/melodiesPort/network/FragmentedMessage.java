@@ -39,10 +39,11 @@ public abstract class FragmentedMessage extends Message {
 
     @Override
     public void receive(PlayerEntity e) {
-        Queue<byte[]> byteBuffer = buffer.computeIfAbsent((e == null ? "local" : e.getUuidAsString()) + ":" + name, k -> new ConcurrentLinkedQueue<>());
+        String identifier = (e == null ? "local" : e.getUuidAsString()) + ":" + name;
+        Queue<byte[]> byteBuffer = buffer.computeIfAbsent(identifier, k -> new ConcurrentLinkedQueue<>());
         byteBuffer.add(fragment);
 
-        if (byteBuffer.stream().mapToInt(f -> f.length).sum() == length) {
+        if (byteBuffer.stream().mapToInt(f -> f.length).sum() >= length) {
             // Assemble
             PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
             for (byte[] b : byteBuffer) {
@@ -50,6 +51,8 @@ public abstract class FragmentedMessage extends Message {
             }
 
             finish(e, name, new Melody(buffer));
+
+            FragmentedMessage.buffer.remove(identifier);
         }
     }
 

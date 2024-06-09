@@ -5,6 +5,11 @@ import ab.melodiesPort.client.gui.widget.MelodyListWidget;
 import ab.melodiesPort.client.gui.widget.TexturedButtonWidget;
 import ab.melodiesPort.cobalt.network.NetworkHandler;
 import ab.melodiesPort.mixin.ScreenMixin;
+import ab.melodiesPort.item.InstrumentItem;
+import ab.melodiesPort.network.c2s.TrackToggleMessage;
+import ab.melodiesPort.resources.Track;
+import net.minecraft.util.Hand;
+import net.minecraft.item.ItemStack;
 import ab.melodiesPort.network.PacketSplitter;
 import ab.melodiesPort.network.c2s.ItemActionMessage;
 import ab.melodiesPort.network.c2s.MelodyDeleteRequest;
@@ -36,17 +41,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 public class ImmersiveMelodiesScreen extends Screen {
     public static final Identifier BACKGROUND_TEXTURE = new Identifier("immersive_melodies:textures/gui/paper.png");
     private MelodyListWidget list;
+    private MelodyListWidget trackList;
     private TextFieldWidget search;
 
     private Text error;
     private long lastError;
+    private boolean showTrackSelection;
+    private Set<Integer> enabledTracks;
+    private Identifier selected;
 
     public static boolean shouldRenderGUI = false;
     public static  int _y;
@@ -59,8 +66,6 @@ public class ImmersiveMelodiesScreen extends Screen {
         this.search.setSuggestion(null);
     }
 
-    @Nullable
-    private Identifier selected = null;
 
     public ImmersiveMelodiesScreen() {
         super(Text.translatable("itemGroup.immersive_melodies.immersive_melodies_tab"));
@@ -85,9 +90,36 @@ public class ImmersiveMelodiesScreen extends Screen {
         this.search.setSuggestion("Search");
         setInitialFocus(this.search);
 
-        list = new MelodyListWidget(this.client, this);
+
+        int y = (height - 230) / 2 + 22;
+        list = new MelodyListWidget(this.client, this, this.width / 2 - 75, 150, y, 162, true);
+        trackList = new MelodyListWidget(this.client, this, this.width / 2 + 100, 85, y + 8, 142, false);
+
+        // Select the current melody
+        if (client != null && client.player != null) {
+            ItemStack stack = client.player.getStackInHand(Hand.MAIN_HAND);
+            if (stack.getItem() instanceof InstrumentItem item) {
+                selected = item.getMelody(stack);
+            }
+        }
+
 
         refreshPage();
+    }
+
+    private void updateTrackList() {
+        if (client != null && client.player != null) {
+            ItemStack stack = client.player.getStackInHand(Hand.MAIN_HAND);
+            if (stack.getItem() instanceof InstrumentItem item) {
+                Set<Integer> newEnabledTracks = item.getEnabledTracks(stack);
+                if (!Objects.equals(newEnabledTracks, enabledTracks)) {
+                    enabledTracks = new HashSet<>(newEnabledTracks);
+                    refreshPage();
+                }
+            } else {
+                enabledTracks = new HashSet<>();
+            }
+        }
     }
 
     private void openHelp() {
@@ -146,6 +178,14 @@ public class ImmersiveMelodiesScreen extends Screen {
     }
 
     @Override
+    public void tick() {
+        super.tick();
+
+        //TODO
+        //updateTrackList();
+    }
+
+    @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         this.renderBackground(context, mouseX, mouseY, delta);
 
@@ -153,6 +193,17 @@ public class ImmersiveMelodiesScreen extends Screen {
         int y = (this.height - 230) / 2;
         _x = x;
         _y = y;
+        /*if (showTrackSelection) {
+            int overlap = 10;
+            int trackListWidth = 75;
+            context.drawTexture(BACKGROUND_TEXTURE, x + 192 - overlap, y + 8, 0, 0, 32, 100);
+            context.drawTexture(BACKGROUND_TEXTURE, x + 192 - overlap, y + 108, 0, 115, 32, 100);
+            context.drawTexture(BACKGROUND_TEXTURE, x + 192 - overlap + 32, y + 8, 192 - overlap - trackListWidth, 0, overlap + trackListWidth, 100);
+            context.drawTexture(BACKGROUND_TEXTURE, x + 192 - overlap + 32, y + 108, 192 - overlap - trackListWidth, 115, overlap + trackListWidth, 100);
+
+            // Track selection title
+            context.drawText(textRenderer, Text.translatable("immersive_melodies.tracks"), width / 2 + 100, height / 2 - 94, 0x000000, false);
+        }*/
 
 
         //context.drawTexture(BACKGROUND_TEXTURE, x, y, 0, 0, 192, 215);
@@ -215,6 +266,31 @@ public class ImmersiveMelodiesScreen extends Screen {
                 selected = entry.getKey();
                 refreshPage();
             });
+
+            if (entry.getKey().equals(selected)) {
+                list.setSelected(list.children().get(list.children().size() - 1));
+            }
+        }
+
+        // Build track list
+        trackList.clearEntries();
+        if (selected != null && showTrackSelection) {
+            addDrawableChild(trackList);
+            Melody melody = ClientMelodyManager.getMelody(selected);
+            if (melody != null) {
+                for (int i = 0; i < melody.getTracks().size(); i++) {
+                    Track track = melody.getTracks().get(i);
+                    int trackId = i;
+                    trackList.addEntry(
+                            new Identifier(selected.getPath() + "/" + i),
+                            Text.translatable(track.getName()).formatted(enabledTracks.contains(i) ? Formatting.DARK_GRAY : Formatting.STRIKETHROUGH),
+                            () -> {
+                                boolean enabled = enabledTracks.contains(trackId);
+                                NetworkHandler.sendToServer(new TrackToggleMessage(selected, trackId, !enabled));
+                                refreshPage();
+                            });
+                }
+            }
         }
 
         int y = this.height / 2 + 69;
@@ -228,7 +304,7 @@ public class ImmersiveMelodiesScreen extends Screen {
 
         // Delete
         if (selected != null && (Utils.canDelete(selected, MinecraftClient.getInstance().player))) {
-            addDrawableChild(new TexturedButtonWidget(width / 2 + 30, y, 16, 16, BACKGROUND_TEXTURE, 256 - 16, 16, 256, 256, Text.of((String) null), button -> {
+            addDrawableChild(new TexturedButtonWidget(width / 2 + 25, y, 16, 16, BACKGROUND_TEXTURE, 256 - 16, 16, 256, 256, Text.of((String) null), button -> {
                 NetworkHandler.sendToServer(new MelodyDeleteRequest(selected));
                 selected = null;
             }, () -> List.of(Text.translatable("immersive_melodies.delete").asOrderedText())));
@@ -243,6 +319,12 @@ public class ImmersiveMelodiesScreen extends Screen {
         addDrawableChild(new TexturedButtonWidget(width / 2, y, 16, 16, BACKGROUND_TEXTURE, 256 - 16, 32, 256, 256, Text.of((String) null), button -> {
             NetworkHandler.sendToServer(new ItemActionMessage(ItemActionMessage.State.CONTINUE));
         }, () -> List.of(Text.translatable("immersive_melodies.play").asOrderedText())));
+
+        // Track selection
+        /*addDrawableChild(new TexturedButtonWidget(width / 2 - 40, y, 16, 16, BACKGROUND_TEXTURE, 256 - 48, 16, 256, 256, Text.of((String) null), button -> {
+            this.showTrackSelection = !this.showTrackSelection;
+            refreshPage();
+        }, () -> List.of(Text.translatable("immersive_melodies.tracks").asOrderedText())));*/
 
         // Help
         addDrawableChild(new TexturedButtonWidget(width / 2 + 50, y, 16, 16, BACKGROUND_TEXTURE, 256 - 48, 32, 256, 256, Text.of((String) null), button -> {

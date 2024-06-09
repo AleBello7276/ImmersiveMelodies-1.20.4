@@ -32,6 +32,14 @@ public class Melody extends MelodyDescriptor {
         }
     }
 
+    public int getLength() {
+        int length = 0;
+        for (Track track : tracks) {
+            length = Math.max(length, track.getLength());
+        }
+        return length;
+    }
+
     public List<Track> getTracks() {
         return Collections.unmodifiableList(tracks);
     }

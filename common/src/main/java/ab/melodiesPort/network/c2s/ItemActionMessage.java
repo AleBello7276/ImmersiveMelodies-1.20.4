@@ -46,7 +46,7 @@ public class ItemActionMessage extends Message {
         ItemStack stack = e.getInventory().getStack(slot);
         if (stack.getItem() instanceof InstrumentItem instrument) {
             switch (state) {
-                case PLAY -> instrument.play(stack, melody, e.getWorld());
+                case PLAY -> instrument.play(stack, melody, e.getWorld(), e);
                 case CONTINUE -> instrument.play(stack);
                 case PAUSE -> instrument.pause(stack);
             }

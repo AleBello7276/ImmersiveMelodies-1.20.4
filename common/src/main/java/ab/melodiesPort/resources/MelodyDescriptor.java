@@ -1,5 +1,6 @@
 package ab.melodiesPort.resources;
 
+
 import net.minecraft.network.PacketByteBuf;
 
 public class MelodyDescriptor {
@@ -10,6 +11,7 @@ public class MelodyDescriptor {
     }
 
     public MelodyDescriptor(PacketByteBuf b) {
+
         this.name = b.readString();
     }
 

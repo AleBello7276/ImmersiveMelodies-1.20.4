@@ -8,6 +8,7 @@
   "item.immersive_melodies.piano": "Piano",
   "item.immersive_melodies.triangle": "Triangle",
   "item.immersive_melodies.trumpet": "Trumpet",
+  "item.immersive_melodies.tiny_drum": "Tiny Drum",
 
   "immersive_melodies.playing": "Playing",
 
@@ -19,6 +20,7 @@
   "immersive_melodies.remove_favorite": "Remove Favorite",
   "immersive_melodies.delete": "Delete",
   "immersive_melodies.play": "Play",
+  "immersive_melodies.tracks": "Track List",
   "immersive_melodies.help": "Open help",
   "immersive_melodies.pause": "Pause",
   "immersive_melodies.read": "Click to learn how to upload!"

@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "LLL",
+    "SWS",
+    "   "
+  ],
+  "key": {
+    "L": [
+      {
+        "item": "minecraft:leather"
+      }
+    ],
+    "S": [
+      {
+        "item": "minecraft:string"
+      }
+    ],
+    "W": [
+      {
+        "tag": "minecraft:log"
+      }
+    ]
+  },
+  "result": {
+    "item": "immersive_melodies:tiny_drum"
+  }
+}

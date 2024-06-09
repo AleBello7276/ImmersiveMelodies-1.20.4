@@ -2,10 +2,8 @@ package ab.melodiesPort;
 
 
 import ab.melodiesPort.cobalt.network.NetworkHandler;
-import ab.melodiesPort.network.c2s.ItemActionMessage;
-import ab.melodiesPort.network.c2s.MelodyDeleteRequest;
-import ab.melodiesPort.network.c2s.MelodyRequest;
-import ab.melodiesPort.network.c2s.UploadMelodyRequest;
+
+import ab.melodiesPort.network.c2s.*;
 import ab.melodiesPort.network.s2c.MelodyListMessage;
 import ab.melodiesPort.network.s2c.MelodyResponse;
 import ab.melodiesPort.network.s2c.OpenGuiRequest;
@@ -23,5 +21,6 @@ public class Messages {
         NetworkHandler.registerMessage(OpenGuiRequest.class, OpenGuiRequest::new);
         NetworkHandler.registerMessage(ItemActionMessage.class, ItemActionMessage::new);
         NetworkHandler.registerMessage(MelodyDeleteRequest.class, MelodyDeleteRequest::new);
+        NetworkHandler.registerMessage(TrackToggleMessage.class, TrackToggleMessage::new);
     }
 }

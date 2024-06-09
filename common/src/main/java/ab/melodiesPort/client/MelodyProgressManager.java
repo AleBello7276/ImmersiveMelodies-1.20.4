@@ -3,7 +3,7 @@ package ab.melodiesPort.client;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
-
+import ab.melodiesPort.Config;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,13 +17,14 @@ public class MelodyProgressManager {
         return progress.computeIfAbsent(entity, a -> new MelodyProgress());
     }
 
-    public void setLastIndex(Entity entity, int index) {
-        getProgress(entity).lastIndex = index;
+    public void setLastIndex(Entity entity, int track, int index) {
+        getProgress(entity).setLastIndex(track, index);
     }
 
     public void setLastNote(Entity entity, float volume, float pitch, long length) {
         MelodyProgress progress = getProgress(entity);
 
+        progress.lastNoteLongTime = System.currentTimeMillis();
         progress.lastNoteTime = entity.age;
         progress.lastVolume = volume;
         progress.lastPitch = pitch;
@@ -69,7 +70,7 @@ public class MelodyProgressManager {
                 Entity entity0 = list.get(i0);
                 for (int i1 = list.size() - 1; i1 > i0; i1--) {
                     Entity entity1 = list.get(i1);
-                    if (entity0.distanceTo(entity1) < 16.0f) {
+                    if (entity0.distanceTo(entity1) < Config.getInstance().maxAudibleDistance) {
                         // Two entities are close, entity 0 will try to mimic entity 1
                         // Thus, the higher in the order the higher the priority
                         MelodyProgress progress0 = getProgress(entity0);
@@ -78,7 +79,8 @@ public class MelodyProgressManager {
                         if (Math.abs(progress0.time - progress1.time) > 100) {
                             progress0.overwrite(progress1.getCurrentlyPlaying());
                             progress0.time = progress1.time;
-                            progress0.lastIndex = progress1.lastIndex;
+                            progress0.lastIndex.clear();
+                            progress0.lastIndex.putAll(progress1.lastIndex);
                         }
 
                         break;

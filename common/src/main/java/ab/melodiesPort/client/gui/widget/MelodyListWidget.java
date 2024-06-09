@@ -12,13 +12,22 @@ import java.util.Objects;
 
 public class MelodyListWidget extends AlwaysSelectedEntryListWidget<MelodyListWidget.MelodyEntry> {
     private final ImmersiveMelodiesScreen currentScreen;
+    private final boolean showSelection;
     int top;
     int bottom;
-    public MelodyListWidget(MinecraftClient client, ImmersiveMelodiesScreen currentScreen) {
-        super(client, currentScreen.width, 162, (currentScreen.height - 230) / 2 + 22, 10);
+
+    int aLeft;
+    int aRight;
+    public MelodyListWidget(MinecraftClient client, ImmersiveMelodiesScreen currentScreen, int left, int width, int listY, int listH, boolean showSelection) {
+        super(client, currentScreen.width, 162, listY, 10);
 
 
         this.currentScreen = currentScreen;
+
+        this.aLeft = left;
+        this.aRight = this.aLeft + width;
+
+        this.showSelection = showSelection;
 
         top = (currentScreen.height - 230) / 2 + 22;
         bottom = (currentScreen.height - 230) / 2 + 184;
@@ -28,6 +37,7 @@ public class MelodyListWidget extends AlwaysSelectedEntryListWidget<MelodyListWi
         //setRenderHorizontalShadows(false); //TO FIX
         setRenderHeader(false, 0);
     }
+
 
 
 
@@ -63,7 +73,7 @@ public class MelodyListWidget extends AlwaysSelectedEntryListWidget<MelodyListWi
 
     @Override
     protected void enableScissor(DrawContext context) {
-      context.enableScissor(currentScreen.width / 2 - 100, this.top, currentScreen.width / 2 + 70, this.bottom);
+        context.enableScissor(currentScreen.width / 2 - 100, this.top, currentScreen.width / 2 + 70, this.bottom);
     }
 
     @Override
@@ -86,7 +96,7 @@ public class MelodyListWidget extends AlwaysSelectedEntryListWidget<MelodyListWi
 
         @Override
         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            context.drawText(currentScreen.getTextRenderer(), name, currentScreen.width / 2 - 75 + (onPress == null ? -2 : 2), y + 1, 0x404040, false);
+            context.drawText(currentScreen.getTextRenderer(), name, aLeft + (onPress == null ? -2 : 2), y + 1, 0x404040, false);
         }
 
         @Override
@@ -100,7 +110,7 @@ public class MelodyListWidget extends AlwaysSelectedEntryListWidget<MelodyListWi
 
         @Override
         public Text getNarration() {
-            return Text.translatable("narrator.select", name);
+            return name;
         }
 
         @Override

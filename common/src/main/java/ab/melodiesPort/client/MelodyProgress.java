@@ -1,9 +1,13 @@
 package ab.melodiesPort.client;
 
+import ab.melodiesPort.item.InstrumentItem;
 import ab.melodiesPort.resources.ClientMelodyManager;
 import ab.melodiesPort.resources.Melody;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MelodyProgress {
     long lastTime;
@@ -12,8 +16,9 @@ public class MelodyProgress {
     String currentlyPlaying = "";
     String overwritten = null;
     long worldTime;
-    int lastIndex;
+    final Map<Integer, Integer> lastIndex = new HashMap<>();
 
+    long lastNoteLongTime;
     int lastNoteTime;
     float lastVolume;
     float lastPitch;
@@ -37,8 +42,8 @@ public class MelodyProgress {
         lastTime = l;
 
         // reset progress on change
-        String identifier = stack.getOrCreateNbt().getString("melody");
-        long startTime = stack.getOrCreateNbt().getLong("start_time");
+        String identifier = stack.getOrCreateNbt().getString(InstrumentItem.TAG_MELODY);
+        long startTime = stack.getOrCreateNbt().getLong(InstrumentItem.TAG_START_TIME);
 
         // reset if the melody changed
         if (!currentlyPlaying.equals(identifier)) {
@@ -46,7 +51,7 @@ public class MelodyProgress {
             overwritten = null;
             worldTime = startTime;
             time = 0;
-            lastIndex = 0;
+            lastIndex.clear();
         }
 
         // reset when the start time appears to be off
@@ -54,7 +59,7 @@ public class MelodyProgress {
             worldTime = startTime;
             overwritten = null;
             time = 0;
-            lastIndex = 0;
+            lastIndex.clear();
         }
     }
 
@@ -62,8 +67,12 @@ public class MelodyProgress {
         return time;
     }
 
-    public int getLastIndex() {
-        return lastIndex;
+    public int getLastIndex(int track) {
+        return lastIndex.getOrDefault(track, 0);
+    }
+
+    public void setLastIndex(int track, int index) {
+        lastIndex.put(track, index);
     }
 
     public float getCurrent() {
@@ -99,7 +108,10 @@ public class MelodyProgress {
     }
 
     public boolean isPlaying() {
-        return (System.currentTimeMillis() - lastTime) < 1000;
+        return delta() < 1000;
+    }
+    public long delta() {
+        return System.currentTimeMillis() - lastNoteLongTime;
     }
 
     public Melody getMelody() {

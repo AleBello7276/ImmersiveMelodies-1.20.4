@@ -29,6 +29,7 @@ public interface Items {
     Supplier<Item> PIANO = register(Common.MOD_ID, "piano", 300, new Vector3f(0.0f, 0.25f, 0.5f));
     Supplier<Item> TRIANGLE = register(Common.MOD_ID, "triangle", 300, new Vector3f(0.0f, 0.0f, 0.6f));
     Supplier<Item> TRUMPET = register(Common.MOD_ID, "trumpet", 100, new Vector3f(0.0f, 0.25f, 1.4f));
+    Supplier<Item> TINY_DRUM = register(Common.MOD_ID, "tiny_drum", 300, new Vector3f(0.0f, 0.25f, 0.5f));
 
     /**
      * Open method to create custom items, for addons
@@ -37,11 +38,8 @@ public interface Items {
      * @param name      Your addon's item name
      * @param animator  Your item's animator. Allows to define how the entity
      *                  model should be animated when playing the instrument.
-     * @param sustain   Determines the instrument's note sustain capacity.
-     *                  Defines how many ticks can a note hold for the longest
-     *                  with your custom instrument.
-     * @param offset   Determines the offset from the player's location
-     *                  of the position at which a note particle should be displayed.
+     * @param sustain   The instruments sustain, in ticks.
+     * @param offset    Determines the offset from the player's location
      * @return The registered item's provider.
      */
     static @Nullable Supplier<Item> register(@NotNull String namespace, @NotNull String name, Animator animator,
@@ -58,10 +56,8 @@ public interface Items {
      *
      * @param namespace Your addon's namespace
      * @param name      Your addon's item name
-     * @param sustain   Your item's animator. Allows to define how the entity
-     *                  model should be animated when playing the instrument.
-     * @param offset   Determines the offset from the player's location
-     *                  of the position at which a note particle should be displayed.
+     * @param sustain   The instruments sustain, in ticks.
+     * @param offset    Determines the offset from the player's location
      * @return The registered item's provider.
      */
     static @Nullable Supplier<Item> register(@NotNull String namespace, @NotNull String name,

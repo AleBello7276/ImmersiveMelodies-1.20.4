@@ -14,6 +14,7 @@ public final class Config extends JsonConfig {
 
     public boolean showOtherPlayersMelodies = true;
     public int getBufferDelay = 75;
+    public int maxAudibleDistance = 48;
     public Map<String, Float> mobInstrumentFactors = Map.of(
             "minecraft:zombie", 0.01f,
             "minecraft:skeleton", 0.01f,

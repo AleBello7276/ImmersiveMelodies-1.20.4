@@ -1,5 +1,6 @@
 package ab.melodiesPort.util;
 
+import ab.melodiesPort.Common;
 import ab.melodiesPort.resources.Melody;
 import ab.melodiesPort.resources.Note;
 
@@ -32,7 +33,7 @@ public class MidiParser {
                 events.addAll(0, sharedEvents);
                 events.sort((a, b) -> (int) (a.getTick() - b.getTick()));
 
-                int bpm = 120;
+                double bpm = 120;
                 long lastTick = 0;
                 double lastMs = 0;
                 String name = "Track " + trackNr;
@@ -47,9 +48,9 @@ public class MidiParser {
                         byte[] data = metaMessage.getData();
                         int type = metaMessage.getType();
                         if (type == 0x03) {
-                            if (sequence.getTracks().length > 1) {
-                                name = new String(data).strip();
-                            }
+                            name = new String(data).strip();
+                        } else if (type == 0x04) {
+                            String instrument = new String(data).strip();
                         } else if (type == 0x51) {
                             int microsecondsPerBeat = ((data[0] & 0xFF) << 16) | ((data[1] & 0xFF) << 8) | (data[2] & 0xFF);
                             bpm = Math.round(60000000.0f / microsecondsPerBeat);
@@ -62,9 +63,11 @@ public class MidiParser {
 
                         // Convert notes into ms
                         long tick = event.getTick();
-                        int ms = (int) ((tick - lastTick) * 60 * 1000 / sequence.getResolution() / bpm + lastMs);
+                        double deltaMs = ((tick - lastTick) * 60000.0) / (sequence.getResolution() * bpm);
+                        double rms = (int) (deltaMs + lastMs);
                         lastTick = tick;
-                        lastMs = ms;
+                        lastMs = rms;
+                        int ms = (int) rms;
 
                         // Another way to decode note offs are note ons with velocity 0
                         if (command == ShortMessage.NOTE_ON && sm.getData2() == 0) {
@@ -94,7 +97,7 @@ public class MidiParser {
                     }
                 }
 
-                if (notes.size() > 0) {
+                if (!notes.isEmpty()) {
                     trackNr += 1;
 
                     // Sort
@@ -104,7 +107,7 @@ public class MidiParser {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Common.LOGGER.error(e);
         }
 
         return melody;

@@ -10,8 +10,8 @@ public class Track {
     private final List<Note> notes;
     private final String name;
 
-    public Track() {
-        this("unknown", new LinkedList<>());
+    public String getName(){
+        return name;
     }
 
     public Track(String name, List<Note> notes) {
@@ -40,5 +40,11 @@ public class Track {
         for (Note note : notes) {
             note.encode(b);
         }
+    }
+
+    public int getLength() {
+        if (notes.isEmpty()) return 0;
+        Note note = notes.get(notes.size() - 1);
+        return note.getTime() + note.getLength();
     }
 }
