@@ -1,3 +1,12 @@
+# 1.0.2
+
+
+* Added a tiny drum
+* Sounds are now played at twice the distance (32 blocks)
+* Fixed issues with updating/reuploading tracks
+
+* Fixed dedicated server crash
+
 # 1.0.1
 
 * Zombiefied Piglins now also move their arms
